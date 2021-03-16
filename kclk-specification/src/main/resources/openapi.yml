@@ -1,0 +1,286 @@
+  openapi: 3.0.2
+  info:
+    title: Kclk open api
+    version: 0.0.1
+  paths:
+    /auth/admin/realms:
+      get:
+        responses:
+          200:
+            description: get all realms
+            content:
+              application/json:
+                schema:
+                  items:
+                    $ref: '#/components/schemas/Realm'
+      post:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Realm'
+        responses:
+          201:
+            description: created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Realm'
+    /auth/admin/realms/{realmId}:
+      get:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+        responses:
+          200:
+            description: get single realm
+            content:
+              application/json:
+                schema:
+                  $ref:  '#/components/schemas/Realm'
+    /auth/admin/realms/{realmId}/clients:
+      get:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+        responses:
+          200:
+            description: get all clients in realm
+            content:
+              application/json:
+                schema:
+                  items:
+                    $ref: '#/components/schemas/Client'
+      post:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        responses:
+          201:
+            description: created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Client'
+    /auth/admin/realms/{realmId}/clients/{id}:
+      get:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+          - in: path
+            name: id
+            schema:
+              type: string
+              format: uuid
+            required: true
+        responses:
+          200:
+            description: get client
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Client'
+      put:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+          - in: path
+            name: id
+            schema:
+              type: string
+              format: uuid
+            required: true
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        responses:
+          200:
+            description: updated
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Client'
+    /auth/admin/realms/{realmId}/clients/{id}/client-secret:
+      get:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+          - in: path
+            name: id
+            schema:
+              type: string
+              format: uuid
+            required: true
+        responses:
+          200:
+            description: client creds
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ClientSecret'
+      post:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+          - in: path
+            name: id
+            schema:
+              type: string
+              format: uuid
+            required: true
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientSecret'
+        responses:
+          200:
+            description: client creds updated
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ClientSecret'
+#  /auth/admin/realms/{realmId}/users/{userId}/role-mappings/realm/composite
+    /auth/realms/{realmId}/protocol/openid-connect/token:
+      post:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+        requestBody:
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  grant_type:
+                    type: string
+                    default: client_credentials
+                  client_secret:
+                    type: string
+                  client_id:
+                    type: string
+                required:
+                  - grant_type
+                  - client_secret
+                  - client_id
+        responses:
+          200:
+            description: generate token
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Token'
+    /auth/realms/{realmId}/protocol/openid-connect/userinfo:
+      post:
+        parameters:
+          - in: path
+            name: realmId
+            schema:
+              type: string
+            required: true
+          - in: header
+            name: Authorization
+            schema:
+              type: string
+            required: true
+        responses:
+          200:
+            description: signature valid
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/UserInfo'
+  components:
+    schemas:
+      Client:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          clientId:
+            type: string
+          enabled:
+            type: boolean
+            default: true
+          attributes:
+            type: object
+            properties:
+              'access.token.lifespan':
+                type: integer
+                format: int64
+                minimum: 0
+        required:
+          - id
+          - clientId
+          - attributes
+      ClientSecret:
+        type: object
+        properties:
+          'type':
+            type: string
+            default: 'secret'
+          'value':
+            type: string
+      Realm:
+        type: object
+        properties:
+          id:
+            type: string
+            nullable: false
+          enabled:
+            type: boolean
+            default: true
+        required:
+          - id
+          - enabled
+      Token:
+        type: object
+        properties:
+          access_token:
+            type: string
+      UserInfo:
+        type: object
+        properties:
+          sub:
+            type: string
+            format: uuid
+          email_verified:
+            type: boolean
+            default: false
+          preferred_username:
+            type: string
+          roles:
+            type: array
+            items:
+              type: string

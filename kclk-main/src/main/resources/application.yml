@@ -1,0 +1,13 @@
+server:
+  port: 48080
+
+spring:
+  datasource:
+    url: jdbc:h2:./db
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: localhost:${server.port}/auth/realms/admin
+
