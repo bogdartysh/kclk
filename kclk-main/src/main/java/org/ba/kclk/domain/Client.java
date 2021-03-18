@@ -6,15 +6,14 @@ import java.util.*;
 
 @AllArgsConstructor
 @Builder
-@Data
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="client")
 public class Client {
     @Id
     @GeneratedValue
-
     UUID id;
     String clientId;
     Boolean enabled;

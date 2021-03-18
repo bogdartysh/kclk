@@ -1,20 +1,20 @@
 package org.ba.kclk.domain;
 
 import lombok.*;
+
 import javax.persistence.*;
-import java.util.*;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Builder
-@Data
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "client_role")
 public class ClientRole {
-        @Id
+    @Id
     @GeneratedValue
-
     UUID id;
 
     String name;
